@@ -1,4 +1,9 @@
+"""Hash Map"""
+
+
 class Node(object):
+    """class Node"""
+
     def __init__(self, data=None):
         # Информационная составляющая
         self.data = data
@@ -7,6 +12,8 @@ class Node(object):
 
 
 class SingleList:
+    """class Linked List"""
+
     def __init__(self):
         self.head = None
         self.end = None
@@ -74,7 +81,6 @@ class SingleList:
         prev_node = None
         while now_node is not None:
             if now_id == item_id:
-                # если хотим удлать элемент который уже встречался, то заменим на prev_node.data == item
                 if prev_node is not None:
                     prev_node.next = now_node.next
                 else:
@@ -89,6 +95,25 @@ class SingleList:
         while current is not None:
             yield current.data
             current = current.next
+
+    def __getitem__(self, item):
+        if self.lenth >= item:
+            node = self.head
+            i = 0
+            while i < item:
+                node = node.next
+                i += 1
+            return node.data
+        raise IndexError
+
+    def __setitem__(self, key, value):
+        if self.lenth >= key:
+            node = self.head
+            i = 0
+            while i < key:
+                node = node.next
+                i += 1
+            node.data = value
 
 
 class HashMap:
@@ -109,14 +134,20 @@ class HashMap:
 
         if self._length >= self._size * 0.8:
             self._size *= 2
-            self._inner_list = self._inner_list + [SingleList() for i in range(self._size)]
+            new_inner_list = [SingleList() for i in range(self._size)]
+            for i in self._inner_list:
+                if i.lenth != 0:
+                    for element in i:
+                        new_inner_list[hash(element[0]) % self._size].add_item(element)
+
+            self._inner_list = new_inner_list
 
     def __getitem__(self, key):
         hash_id = hash(key) % self._size
         for element in self._inner_list[hash_id]:
             if element[0] == key:
                 return element[1]
-        raise KeyError
+        return None
 
     def __str__(self):
         s = ''
@@ -138,4 +169,3 @@ class HashMap:
 
     def size(self):
         return self._size
-
