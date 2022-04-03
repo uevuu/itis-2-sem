@@ -1,5 +1,6 @@
 """Realisation of TreeMap"""
 from itertools import chain
+from src.maps.base_map import BaseMap
 
 
 class Node:
@@ -21,7 +22,7 @@ class Node:
         return False
 
 
-class TreeMap:
+class TreeMap(BaseMap):
     """class TreeMap"""
 
     def __init__(self, root=None):
@@ -116,3 +117,6 @@ class TreeMap:
                 yield from iter_node(node.right)
 
         yield from iter_node(self.root)
+
+    def __len__(self):
+        return self.size

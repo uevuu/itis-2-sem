@@ -1,5 +1,7 @@
 """Realisation of Linked list and HashMap"""
 
+from src.maps.base_map import BaseMap
+
 
 class Node:
     """class Node"""
@@ -112,9 +114,29 @@ class SingleList:
             yield current.data
             current = current.next
 
+    def __getitem__(self, item):
+        if self.lenth >= item:
+            node = self.head
+            i = 0
+            while i < item:
+                node = node.next
+                i += 1
+            return node.data
+        raise IndexError
 
-class HashMap:
+    def __setitem__(self, key, value):
+        if self.lenth >= key:
+            node = self.head
+            i = 0
+            while i < key:
+                node = node.next
+                i += 1
+            node.data = value
+
+
+class HashMap(BaseMap):
     """class HashMap"""
+
     def __init__(self, _size=10):
         self._size = _size
         self._inner_list = [SingleList() for i in range(_size)]
@@ -130,16 +152,22 @@ class HashMap:
             self._inner_list[hash_id].add_item([key, value])
             self._length += 1
 
-        if self._length >= self._size * 0.8:
+        if self._length > self._size * 0.8:
             self._size *= 2
-            self._inner_list = self._inner_list + [SingleList() for i in range(self._size)]
+            new_inner_list = [SingleList() for i in range(self._size)]
+            for i in self._inner_list:
+                if i.lenth != 0:
+                    for element in i:
+                        new_inner_list[hash(element[0]) % self._size].add_item(element)
+
+            self._inner_list = new_inner_list
 
     def __getitem__(self, key):
         hash_id = hash(key) % self._size
         for element in self._inner_list[hash_id]:
             if element[0] == key:
                 return element[1]
-        raise KeyError
+        return None
 
     def __str__(self):
         print_s = ''
@@ -157,6 +185,13 @@ class HashMap:
         if self._inner_list[hash_id] is not None:
             self._inner_list[hash_id] = SingleList()
             self._length -= 1
+
+    def __iter__(self):
+        temp = SingleList()
+        for i in self._inner_list:
+            for j in i:
+                temp.add_item(j)
+        return temp.__iter__()
 
     def size(self):
         """return size of HashMap"""
