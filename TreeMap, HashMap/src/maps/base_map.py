@@ -39,7 +39,7 @@ class BaseMap(ABC):
         my_obj = cls()
         with open(path, 'r', encoding="utf-8") as file:
             for line in file:
-                if len(line) != 0:
-                    line.split("\t")
-                    my_obj[line[0]] = int(line[1])
+                key, value = line.split('\t')[0]
+                my_obj[key] = int(value)
+
         return my_obj

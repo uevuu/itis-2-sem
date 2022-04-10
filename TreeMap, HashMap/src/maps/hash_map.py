@@ -17,9 +17,7 @@ class Node:
 
     def positive_data(self):
         """checking that data >= 0"""
-        if self.data >= 0:
-            return True
-        return False
+        return self.data >= 0
 
 
 class SingleList:
