@@ -31,15 +31,15 @@ class BaseMap(ABC):
         """write Map in file"""
         with open(path, "w+", encoding="utf-8") as file:
             for key, data in self:
-                file.write(f"{key}\t{data}\n")
+                file.write(f"{key}: {data}\n")
 
     @classmethod
     def read(cls, path: str) -> 'BaseMap':
-        """read file in Map"""
+        """read data in Map"""
         my_obj = cls()
         with open(path, 'r', encoding="utf-8") as file:
             for line in file:
-                key, value = line.split('\t')[0]
+                key, value = line.split(': ')
                 my_obj[key] = int(value)
 
         return my_obj

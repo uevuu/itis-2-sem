@@ -1,4 +1,4 @@
-"""init file"""
+"""init data"""
 import unittest
 
 class MyTestCase(unittest.TestCase):
