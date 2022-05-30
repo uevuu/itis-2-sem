@@ -1,12 +1,30 @@
+"""Realisation of TreeMap"""
+from itertools import chain
+from src.maps.base_map import BaseMap
+
+
 class Node:
+    """class node"""
+
     def __init__(self, key, value, left=None, right=None):
         self.key = key
         self.value = value
         self.left = left
         self.right = right
 
+    def __str__(self):
+        return f'{self.key} --> {self.value}'
 
-class TreeMap:
+    def have_leaf(self):
+        """checking for leaves"""
+        if self.right is not None or self.left is not None:
+            return True
+        return False
+
+
+class TreeMap(BaseMap):
+    """class TreeMap"""
+
     def __init__(self, root=None):
         self.root = root
         self.size = 0
@@ -34,9 +52,7 @@ class TreeMap:
                 node.right = Node(key, value)
 
     def __getitem__(self, key):
-        if self.root is None:
-            raise KeyError
-        else:
+        if self.root is not None:
             node = self._get(key, self.root)
             if node is not None:
                 return node.value
@@ -45,15 +61,15 @@ class TreeMap:
     def _get(self, key, node):
         if key < node.key:
             return self._get(key, node.left)
-        elif key > node.key:
+        if key > node.key:
             return self._get(key, node.right)
-        elif node.key == key:
+        if node.key == key:
             return node
-        else:
-            return None
+        return None
 
     @staticmethod
     def find_left_node(node):
+        """looking minimum node"""
         if node.left is not None:
             return TreeMap.find_left_node(node.left)
         return node
@@ -64,23 +80,43 @@ class TreeMap:
     def _delete(self, node, key):
         if node is None:
             raise KeyError
-        elif key > node.key:
+        if key > node.key:
             result = self._delete(node.right, key)
             node.right = result
             return node
-        elif key < node.key:
+        if key < node.key:
             result = self._delete(node.left, key)
             node.left = result
             return node
-        else:
-            if node.left is None and node.right is None:
-                return None
-            elif node.left is not None and node.right is None:
-                return node.left
-            elif node.left is None and node.right is not None:
-                return node.right
-            else:
-                min_node = TreeMap.find_left_node(node.right)
-                node.key, node.value = min_node.key, min_node.value
-                node.right = self._delete(node.right, min_node.key)
-                return node
+        if node.left is None and node.right is None:
+            return None
+        if node.left is not None and node.right is None:
+            return node.left
+        if node.left is None and node.right is not None:
+            return node.right
+        min_node = TreeMap.find_left_node(node.right)
+        node.key, node.value = min_node.key, min_node.value
+        node.right = self._delete(node.right, min_node.key)
+        return node
+
+    def __str__(self):
+        nodes = [self.root]
+        lines = []
+        while any(nodes):
+            lines.append('\t'.join(str(node and node.key) for node in nodes))
+            nodes = list(
+                chain.from_iterable([node and node.left, node and node.right] for node in nodes)
+            )
+        return "\n".join(lines)
+
+    def __iter__(self):
+        def iter_node(node):
+            if node is not None:
+                yield node.key, node.value
+                yield from iter_node(node.left)
+                yield from iter_node(node.right)
+
+        yield from iter_node(self.root)
+
+    def __len__(self):
+        return self.size
